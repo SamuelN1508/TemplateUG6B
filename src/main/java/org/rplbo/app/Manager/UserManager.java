@@ -51,6 +51,11 @@ public class UserManager {
         return userList;
     }
 
+    // --- METHOD UPDATE PROFILE (Edit Password & Email Pasien/Dokter) ---
+    public boolean updateUserProfile(String oldUsername, String newUsername, String newPassword, String newEmail) {
+        return false;
+    }
+
     // --- METHOD REGISTER (INSERT) ---
     public boolean registerUser(String username, String password, String email, String role) {
         return false;

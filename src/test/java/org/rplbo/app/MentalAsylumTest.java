@@ -51,43 +51,47 @@ public class MentalAsylumTest {
     }
 
     // =========================================================
-    // SKENARIO 1: FITUR PASIEN (Autentikasi & Lihat Dokter)
+    // SKENARIO 1: FITUR PASIEN (Update Profil & Autentikasi)
     // =========================================================
     @Test
     @Order(1)
     public void testFiturPasien() {
         // 1. Pasien Registrasi
-        userManager.registerUser("test_pasienA", "pass123", "A@mail.com", "pasien");
+        userManager.registerUser("test_pasienA", "passlama", "A@mail.com", "pasien");
 
-        // 2. Verifikasi Login
-        boolean loginSukses = userManager.authenticateUser("test_pasienA", "pass123");
-        assertTrue(loginSukses, "Pasien harusnya bisa login dengan kredensial yang benar");
+        // 2. Pasien Update Profil (Sesuai Menu Pasien No 2)
+        boolean updateSukses = userManager.updateUserProfile("test_pasienA", "test_pasienBaru", "passbaru", "baru@mail.com");
+        assertTrue(updateSukses, "Pasien harusnya bisa mengupdate profilnya");
 
-        // 3. Pasien Lihat Daftar Dokter
-        userManager.registerUser("test_dokterX", "123", "docX@mail.com", "dokter");
-        List<User> listDokter = userManager.getUsersByRole("dokter");
-        assertFalse(listDokter.isEmpty(), "Pasien harusnya bisa melihat list yang berisi dokter");
-        assertEquals("dokter", listDokter.get(0).getRole(), "Role yang ditarik haruslah dokter");
+        // 3. Verifikasi Login dengan Data Baru
+        boolean loginSukses = userManager.authenticateUser("test_pasienBaru", "passbaru");
+        assertTrue(loginSukses, "Pasien harusnya bisa login dengan kredensial yang baru diubah");
 
         skorAkhir += 25;
-        System.out.println("[✔] Skenario 1 Lolos: Fitur Pasien (Auth & Lihat Dokter) (+25 Poin)");
+        System.out.println("[✔] Skenario 1 Lolos: Fitur Pasien (Update Profil & Auth) (+25 Poin)");
     }
 
     // =========================================================
-    // SKENARIO 2: FITUR GUEST (Cek Keberadaan Pasien)
+    // SKENARIO 2: FITUR GUEST (Cek Pasien & Lihat Dokter)
     // =========================================================
     @Test
     @Order(2)
     public void testFiturGuest() {
-        // Siapkan data rekam medis
+        // Siapkan data dokter dan rekam medis
+        userManager.registerUser("test_dokterA", "123", "doc@mail.com", "dokter");
         rekamMedisManager.tambahRekamMedis("test_dokterA", "test_pasienGuest", "Rahasia", "10-10-2026");
 
-        // Guest Cek Keberadaan Pasien
+        // 1. Guest Cek Keberadaan Pasien (Sesuai Menu Guest No 1)
         List<RekamMedis> hasilCari = rekamMedisManager.cariRekamMedisPasien("test_pasienGuest");
         assertFalse(hasilCari.isEmpty(), "Guest harusnya bisa menemukan status pasien yang dicari");
 
+        // 2. Guest Lihat Daftar Dokter (Sesuai Menu Guest No 2)
+        List<User> listDokter = userManager.getUsersByRole("dokter");
+        assertFalse(listDokter.isEmpty(), "Guest harusnya bisa melihat list yang berisi dokter");
+        assertEquals("dokter", listDokter.get(0).getRole(), "Role yang ditarik haruslah dokter");
+
         skorAkhir += 25;
-        System.out.println("[✔] Skenario 2 Lolos: Akses Publik Guest (Cek Pasien) (+25 Poin)");
+        System.out.println("[✔] Skenario 2 Lolos: Akses Publik Guest (Cek Pasien & Lihat Dokter) (+25 Poin)");
     }
 
     // =========================================================
@@ -101,11 +105,11 @@ public class MentalAsylumTest {
         String cekRole = userManager.getUserRole("test_pasienAsli");
         assertEquals("pasien", cekRole, "Validasi harus mengenali bahwa ini adalah pasien");
 
-        // 2. Dokter Tambah Rekam Medis
+        // 2. Dokter Tambah Rekam Medis (Sesuai Menu Dokter No 1)
         boolean tambahSukses = rekamMedisManager.tambahRekamMedis("test_dokterB", "test_pasienAsli", "Sakit Kepala", "11-10-2026");
         assertTrue(tambahSukses, "Dokter harusnya berhasil menambah rekam medis");
 
-        // 3. Dokter Lihat Semua Data (Get All)
+        // 3. Dokter Lihat Semua Data (Sesuai Menu Dokter No 5)
         List<RekamMedis> allData = rekamMedisManager.getAllRekamMedis();
         assertFalse(allData.isEmpty(), "Dokter harusnya bisa menarik semua data rekam medis");
 
@@ -124,11 +128,11 @@ public class MentalAsylumTest {
         List<RekamMedis> list = rekamMedisManager.cariRekamMedisPasien("test_pasienEdit");
         int targetId = list.get(0).getId();
 
-        // 1. Dokter Edit Data (UPDATE)
+        // 1. Dokter Edit Data (UPDATE - Sesuai Menu Dokter No 3)
         boolean hasilEdit = rekamMedisManager.editRekamMedis(targetId, "Sembuh Total");
         assertTrue(hasilEdit, "Dokter harusnya bisa mengedit diagnosis");
 
-        // 2. Dokter Hapus Data (DELETE)
+        // 2. Dokter Hapus Data (DELETE - Sesuai Menu Dokter No 4)
         boolean hasilHapus = rekamMedisManager.hapusRekamMedis(targetId);
         assertTrue(hasilHapus, "Dokter harusnya bisa menghapus data rekam medis");
 
